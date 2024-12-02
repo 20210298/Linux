@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <error.h>
 
 typedef struct CMD
 {
@@ -148,13 +149,13 @@ int cmd_cd(int argc, char *argv[])
         if (home == NULL)
         {
             perror("NO HOME");
-            return 1;
+            return 0;
         }
         // 환경 변수에 다른 home을 설정했다면 오류 발생 가능
         if (chdir(home) != 0)
         {
             perror("cd");
-            return 1;
+            return 0;
         }
     }
     else if (argc == 2)
@@ -162,18 +163,18 @@ int cmd_cd(int argc, char *argv[])
         if (argv[1][0] == '-')
         {
             fprintf(stderr, "옵션 지원 안함\n");
-            return 1;
+            return 0;
         }
         if (chdir(argv[1]) != 0)
         {
-            fprintf(stderr, "그런 디렉터리가 없습니다: %s\n", argv[1]);
-            return 1;
+            perror("cd");
+            return 0;
         }
     }
     else
     {
         fprintf(stderr, "cd: too many argumnets\n");
-        return 1;
+        return 0;
     }
 
     return 0;
@@ -186,7 +187,7 @@ int cmd_pwd(int argc, char *argv[])
     {
         // 현재 디렉터리에 권한이 없거나 같은 오류
         perror("pwd");
-        return 1;
+        return 0;
     }
 
     if (argc >= 2)
@@ -195,7 +196,7 @@ int cmd_pwd(int argc, char *argv[])
         {
             // 2번째 인자로 옵션 오는 경우는 작동함
             fprintf(stderr, "옵션 지원 안함\n");
-            return 1;
+            return 0;
         }
     }
 
@@ -217,20 +218,22 @@ int cmd_help(int argc, char *argv[])
             printf("%-10s : %s\n", builtin[i].name, builtin[i].desc);
         }
     }
-    else if (argc == 2)
+    else if (argc >= 2)
     {
+        int isFind = 0;
         for (int i = 0; i < builtins; ++i)
         {
             if (!(strcmp(argv[1], builtin[i].name)))
             {
                 printf("%-10s : %s\n", builtin[i].name, builtin[i].desc);
+                isFind = 1;
                 break;
             }
         }
-    }
-    else
-    {
-        return 1;
+        if (!isFind)
+        {
+            fprintf(stderr, "help: no help topics match '%s'.\n", argv[1]);
+        }
     }
 
     return 0;
