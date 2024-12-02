@@ -139,7 +139,7 @@ void operateLOption(char *fileName, char *dirName, int flags[]){
     // 소유자와 그룹
     pwd = getpwuid(statbuf.st_uid);
     grp = getgrgid(statbuf.st_gid);
-    printf("%s %s ", pwd ? pwd->pw_name : "unknown", grp ? grp->gr_name : "unknown");
+    printf("%s %s ", pwd->pw_name, grp->gr_name);
 
     // 파일 크기
     printf("%5ld ", statbuf.st_size);
