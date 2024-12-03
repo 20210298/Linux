@@ -27,7 +27,8 @@ CMD builtin[] = {
     {"pwd", "현재 작업 디렉터리는?", cmd_pwd},
     {"exit", "셸 실행을 종료합니다", cmd_exit},
     {"help", "도움말 보여 주기", cmd_help},
-    {"history", " 명령어 기록 보여 주기", cmd_history}};
+    {"history", "명령어 기록 보여 주기", cmd_history},
+    {"hello", "테스트", cmd_history}};
 const int builtins = sizeof(builtin) / sizeof(CMD);
 
 int main(void)
@@ -271,19 +272,34 @@ int cmd_help(int argc, char *argv[])
     }
     else if (argc >= 2)
     {
-        int isFind = 0;
-        for (int i = 0; i < builtins; ++i)
+        if (argv[1][0] == '-')
         {
-            if (!(strcmp(argv[1], builtin[i].name)))
-            {
-                printf("%-10s : %s\n", builtin[i].name, builtin[i].desc);
-                isFind = 1;
-                break;
-            }
+            fprintf(stderr, "옵션 지원 안함\n");
+            return 0;
         }
-        if (!isFind)
+
+        for (int j = 1; j < argc; ++j)
         {
-            fprintf(stderr, "help: no help topics match '%s'.\n", argv[1]);
+            int isFind = 0;
+
+            if (argv[j][0] == '-')
+            {
+                continue;
+                ;
+            }
+
+            for (int i = 0; i < builtins; ++i)
+            {
+                if (argv[j][0] == builtin[i].name[0])
+                {
+                    printf("%-10s : %s\n", builtin[i].name, builtin[i].desc);
+                    isFind = 1;
+                }
+            }
+            if (!isFind)
+            {
+                fprintf(stderr, "help: no help topics match '%s'.\n", argv[1]);
+            }
         }
     }
 
