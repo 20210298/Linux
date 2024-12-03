@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <error.h>
+#include <ctype.h>
 
 typedef struct CMD
 {
@@ -72,12 +73,62 @@ void add_history(char *command)
     }
 }
 
+#include <stdlib.h> // strtol 사용
+
+int is_number(const char *str)
+{
+    char *endptr;
+
+    if (str == NULL || *str == '\0')
+        return 0;
+
+    strtol(str, &endptr, 10);
+    return *endptr == '\0';
+}
+
 int cmd_history(int argc, char *argv[])
 {
-    for (int i = 0; i < count; ++i)
+    int iter;
+
+    if (argc == 1)
+    {
+        iter = count;
+    }
+    else if (argc == 2)
+    {
+        if (argv[1][0] == '-')
+        {
+            fprintf(stderr, "옵션 지원 안함\n");
+            return 0;
+        }
+        else if (is_number(argv[1]))
+        {
+            int requested = atoi(argv[1]);
+            if (requested > count)
+            {
+                iter = count;
+            }
+            else if (requested >= 0)
+            {
+                iter = requested;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "history: %s: numeric argument required\n", argv[1]);
+            return 0;
+        }
+    }
+    else
+    {
+        fprintf(stderr, "history: too many arguments\n");
+        return 0;
+    }
+
+    for (int i = 0; i < iter; ++i)
     {
         int idx = (head + i) % MAX_LINE;
-        printf("%3d %s", history[idx].num, history[idx].command);
+        printf("%3d %s\n", history[idx].num, history[idx].command);
     }
     return 0;
 }
@@ -185,7 +236,7 @@ int cmd_pwd(int argc, char *argv[])
     char buffer[STR_LEN];
     if (getcwd(buffer, sizeof(buffer)) == NULL)
     {
-        // 현재 디렉터리에 권한이 없거나 같은 오류
+        // 현재 디렉터리에 권한이 없거나와 같은 오류
         perror("pwd");
         return 0;
     }
