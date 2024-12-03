@@ -21,6 +21,7 @@ int cmd_help(int argc, char *arv[]);
 int cmd_history(int argc, char *arv[]);
 int cmdProcessing(void);
 void add_history(char *command);
+int cmd_test(int argc, char *arv[]);
 
 CMD builtin[] = {
     {"cd", "작업 디렉터리 바꾸기", cmd_cd},
@@ -28,7 +29,7 @@ CMD builtin[] = {
     {"exit", "셸 실행을 종료합니다", cmd_exit},
     {"help", "도움말 보여 주기", cmd_help},
     {"history", "명령어 기록 보여 주기", cmd_history},
-    {"hello", "테스트", cmd_history}};
+    {"hello", "테스트", cmd_test}};
 const int builtins = sizeof(builtin) / sizeof(CMD);
 
 int main(void)
@@ -290,7 +291,7 @@ int cmd_help(int argc, char *argv[])
 
             for (int i = 0; i < builtins; ++i)
             {
-                if (argv[j][0] == builtin[i].name[0])
+                if (!strncmp(argv[j], builtin[i].name, strlen(argv[j])))
                 {
                     printf("%-10s : %s\n", builtin[i].name, builtin[i].desc);
                     isFind = 1;
@@ -303,5 +304,10 @@ int cmd_help(int argc, char *argv[])
         }
     }
 
+    return 0;
+}
+
+int cmd_test(int argc, char *arv[])
+{
     return 0;
 }
