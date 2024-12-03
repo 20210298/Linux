@@ -75,8 +75,6 @@ void add_history(char *command)
     }
 }
 
-#include <stdlib.h> // strtol 사용
-
 int is_number(const char *str)
 {
     char *endptr;
@@ -127,10 +125,10 @@ int cmd_history(int argc, char *argv[])
         return 0;
     }
 
-    for (int i = 0; i < iter; ++i)
+    for (int i = count - iter; i < count; ++i)
     {
         int idx = (head + i) % MAX_LINE;
-        printf("%3d %s\n", history[idx].num, history[idx].command);
+        printf("%3d %s", history[idx].num, history[idx].command);
     }
     return 0;
 }
